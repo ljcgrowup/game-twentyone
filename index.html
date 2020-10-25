@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo do 21</title>
+
+    <link rel="stylesheet" href="./bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="shortcut icon" href="./assets/gamepad.png" type="image/png">
+</head>
+<body>
+    
+    <div class="container text-center" id="app">
+        
+        <h1 class="title">Jogo do 21</h1>
+
+        <div class="row">
+            <div class="col-6">
+                <img src="./assets/boy.png" :class="['players', playerActived === 1 ? 'active' : '']" alt="Jogador 1">
+                <p>Player 1</p>
+                <p><b>Pontos: </b>{{ playerOne.points }}</p>
+            </div>
+            <div class="col-6">
+                <img src="./assets/girl.png" :class="['players', playerActived === 2 ? 'active' : '']" alt="Jogador 2">
+                <p>Player 2</p>
+                <p><b>Pontos: </b>{{ playerTwo.points }}</p>
+            </div>
+        </div>
+
+        <div class="controls">
+            <a href="#" class="btn btn-success" @click.prevent="changePlayer">Pular</a>
+            <a href="#" class="btn btn-primary" @click.prevent="finishGame">Finalizar Jogo</a>
+            <a href="#" class="btn btn-danger">Resetar Jogo</a>
+        </div>
+
+        <div class="row mt-2" v-if="gameFinished !== ''">
+            <div class="col-12">
+                <div class="alert alert-dark" role="alert">
+                    {{ gameFinished }}
+                </div>
+            </div>
+        </div>
+
+        <hr>
+
+        <div class="row">
+            <div class="col-6">
+                <a href="#" @click.prevent="selectCard">
+                    <img src="./assets/cards/cardsback.png" alt="Baralho" class="carts">
+                </a>
+            </div>
+            <div class="col-6">
+                <div v-if="cardSelected !== ''">
+                    <img :src="'./assets/cards/' + cardSelected + '.png'" alt="Carta" class="cart">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                playerActived: 1,
+                playerOne: {
+                    points: 0,
+                },
+                playerTwo: {
+                    points: 0,
+                },
+                cardSelected: '',
+                gameFinished: '',
+            },
+            methods: {
+                changePlayer() {
+                    this.playerActived = this.playerActived === 1 ? 2 : 1
+                },
+                selectCard() {
+                    this.cardSelected = Math.floor((Math.random() * 13) + 1)
+                    
+                    if (this.playerActived === 1)
+                        this.playerOne.points += this.cardSelected
+                    
+                    if (this.playerActived === 2)
+                        this.playerTwo.points += this.cardSelected
+
+                    if (this.playerOne.points >= 21 || this.playerTwo.points >= 21)
+                        this.finishGame()
+                },
+                finishGame() {
+                    if (this.playerOne.points <= 21 && this.playerOne.points > this.playerTwo.points)
+                        this.gameFinished = 'Player 1 Compeão!'
+                    else if (this.playerTwo.points <= 21 && this.playerTwo.points > this.playerOne.points)
+                        this.gameFinished = 'Player 2 Compeão!'
+                    else if (this.playerTwo.points > 21)
+                        this.gameFinished = 'Player 1 Compeão!'
+                    else if (this.playerOne.points > 21)
+                        this.gameFinished = 'Player 2 Compeão!'
+                    else
+                        this.gameFinished = 'Empate!'
+
+                    setTimeout(function() {
+                        this.resetGame()
+                    }.bind(this), 3000)
+                },
+                resetGame() {
+                    this.playerOne.points = 0
+                    this.playerTwo.points = 0
+                    this.playerActived = 1
+                    this.cardSelected = ''
+                    this.gameFinished = ''
+                }
+            }
+        })
+    </script>
+</body>
+</html>
